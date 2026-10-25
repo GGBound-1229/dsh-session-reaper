@@ -1,0 +1,5 @@
+# dsh-session-reaper — 会话删除与回收站
+# 挂到 profile 启动链上；不修改任何其它插件的配置行。
+- insert:
+    - id: dsh-session-reaper
+      name: dsh-session-reaper

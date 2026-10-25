@@ -1,0 +1,45 @@
+{
+  "name": "dsh-session-reaper",
+  "version": "0.1.1",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js"
+  },
+  "description": "会话删除与回收站：侧栏会话菜单里的「删除」，日志先移入回收站，可恢复、可手动彻底删除",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "dsh-plugin",
+    "session",
+    "recycle-bin"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GGBound-1229/dsh-session-reaper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GGBound-1229/dsh-session-reaper/issues"
+  },
+  "homepage": "https://github.com/GGBound-1229/dsh-session-reaper#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  }
+}

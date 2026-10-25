@@ -1,0 +1,15 @@
+# 统一按 LF 存储，避免 Windows 上提交 CRLF 后在 Linux/macOS 上出问题
+* text=auto eol=lf
+
+# 明确类型
+*.js   text eol=lf
+*.json text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.md   text eol=lf
+
+# 二进制文件不做转换
+*.png  binary
+*.jpg  binary
+*.gif  binary
+*.mp4  binary
