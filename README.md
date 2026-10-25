@@ -21,17 +21,66 @@ but never deleted」，持久化层也明确不留删除 API。归档只是把�
 
 ## 安装
 
-从 GitHub 安装：
+安装的本质只有两步：**让 pnpm 把包拉进 profile 的 `node_modules`，再把包名加进 `bundles`。**
+难点只在于「用哪一个 pnpm」——DSH 桌面版自带一套 node/pnpm，但装在哪个盘因机器而异，
+所以下面的命令**不写死任何路径**。
 
-```powershell
-# Windows：用 DSH 自带的 pnpm
-cd $env:USERPROFILE\.dsh\profiles\desktop
-node "D:\dsh\resources\runtime\primary-runtime\dependencies\node\bin\node.exe" `
-     "D:\dsh\resources\runtime\primary-runtime\dependencies\pnpm\bin\pnpm.cjs" `
-     add github:GGBound-1229/dsh-session-reaper
+### 第 1 步：找到能用的 pnpm
+
+先看系统里有没有：
+
+```bash
+node --version
+pnpm --version      # 或 npm --version
 ```
 
-然后在 `package.json` 的 `dsh.profile.bundles` 数组末尾加上包名：
+- **有 `node` 和 `pnpm`（或 `npm`）** → 直接用它们，跳到第 2 步。
+  DSH 自带的 node 是 24.x，系统 node 只要是 20 以上就没问题。
+- **没有** → 用 DSH 自带的那套，先把 DSH 安装目录记成 `$DSH_HOME`：
+
+  ```powershell
+  $DSH_HOME = "D:\dsh"          # ← 改成你自己的实际路径
+  & "$DSH_HOME\resources\runtime\primary-runtime\dependencies\node\bin\node.exe" `
+    "$DSH_HOME\resources\runtime\primary-runtime\dependencies\pnpm\bin\pnpm.cjs" `
+    --version
+  ```
+
+  能打印出版本号（形如 `11.x`）就说明这两个路径是对的。
+
+### 第 2 步：装进 profile
+
+```powershell
+# Windows
+cd $env:USERPROFILE\.dsh\profiles\desktop
+```
+
+```bash
+# Linux / macOS
+cd ~/.dsh/profiles/desktop
+```
+
+然后二选一：
+
+```bash
+# 系统有 pnpm
+pnpm add github:GGBound-1229/dsh-session-reaper
+```
+
+```bash
+# 系统有 npm，没 pnpm
+npm install github:GGBound-1229/dsh-session-reaper
+```
+
+```powershell
+# 两个都没有，用 DSH 自带的
+& "$DSH_HOME\resources\runtime\primary-runtime\dependencies\node\bin\node.exe" `
+  "$DSH_HOME\resources\runtime\primary-runtime\dependencies\pnpm\bin\pnpm.cjs" `
+  add github:GGBound-1229/dsh-session-reaper
+```
+
+### 第 3 步：把包名加进 bundles
+
+打开 `~/.dsh/profiles/desktop/package.json`，在 `dsh.profile.bundles` 数组末尾加一行：
 
 ```json
 "bundles": [
@@ -41,10 +90,20 @@ node "D:\dsh\resources\runtime\primary-runtime\dependencies\node\bin\node.exe" `
 ]
 ```
 
-**两步都要做。** 只加 `dependencies` 不加 `bundles`，包在磁盘上但 DSH 不会加载它；
-只加 `bundles` 不加 `dependencies`，DSH 找不到包。
+**这一步不能省。** 只加 `dependencies` 不加 `bundles`，包在磁盘上但 DSH 不会加载它；
+只加 `bundles` 不加 `dependencies`，DSH 找不到包、启动报错。
 
-改完重启 DSH。
+### 第 4 步：重启 DSH
+
+完全退出再打开。重启后侧栏会话行的「⋯」菜单里应该多一项 **删除会话…**。
+
+### 装不上时的排查顺序
+
+1. `pnpm add` 报权限错误 → 用管理员权限重开终端，或确认 `.dsh` 目录可写；
+2. `pnpm add` 报找不到 git → 先装 git，GitHub 安装方式依赖它；
+3. 装完 `node_modules` 里有目录但菜单没变化 → 十有八九是漏了第 3 步的 `bundles`；
+4. 改了代码但不生效 → pnpm 的 `file:` 依赖是**复制**不是链接，改完要重新装一次。
+
 
 ## 删除的执行顺序（不要改动）
 
